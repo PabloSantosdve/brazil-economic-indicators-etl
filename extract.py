@@ -11,5 +11,9 @@ def extrair_serie_bcb(serie_id, data_inicial, data_final):
 
 
 if __name__ == "__main__":
-    dados = extrair_serie_bcb(1, "05/10/2021", "05/10/2026")
-    print(dados)
+    ipca = extrair_serie_bcb(433, "01/10/2021", "05/10/2026")
+    selic = extrair_serie_bcb(432, "01/10/2021", "05/10/2026")
+    dolar = extrair_serie_bcb(1, "01/10/2021", "05/10/2026")
+    print(len(ipca))
+    print(len(selic))
+    print(len(dolar))
