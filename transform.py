@@ -11,7 +11,7 @@ Séries usadas (API SGS do Banco Central):
 
 import pandas as pd
 from extract import  extrair_serie_bcb
-
+from load import salvar_excel
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     """Limpa uma série do Banco Central que já está em um DataFrame.
@@ -91,9 +91,9 @@ if __name__ == "__main__":
     # Renomeia a coluna 'valor' de cada tabela, para que as três tenham nomes
     # diferentes antes de serem juntadas. O inplace=True altera a própria tabela
     # em vez de criar uma cópia.
-    dolar_mensal.rename(columns={'valor': 'dolar'}, inplace=True)
-    selic_mensal.rename(columns={'valor': 'selic'}, inplace=True)
-    ipca_mensal.rename(columns={'valor': 'ipca'}, inplace=True)
+    dolar_mensal.rename(columns={'valor': 'Dolar'}, inplace=True)
+    selic_mensal.rename(columns={'valor': 'Selic'}, inplace=True)
+    ipca_mensal.rename(columns={'valor': 'IPCA'}, inplace=True)
 
     # --- TRANSFORM, parte 3: junta as três tabelas em uma só ---
     # pd.concat com axis=1 coloca as tabelas lado a lado (as colunas se somam),
@@ -108,3 +108,6 @@ if __name__ == "__main__":
     print(df_mensal.head())
     print(df_mensal.tail())
     print(len(df_mensal))
+
+    # --- LOAD: salva a tabela final em Excel ---
+    salvar_excel(df_mensal, "data/indicadores_mensais.xlsx")
