@@ -1,7 +1,7 @@
 """Etapa Load do pipeline ETL de indicadores econômicos do Brasil.
 
-Guarda a tabela final em arquivos que outras pessoas conseguem abrir.
-Por enquanto, gera um relatório em Excel (.xlsx) formatado.
+Guarda a tabela final em arquivos que outras pessoas conseguem abrir:
+um relatório em Excel (.xlsx) formatado e um arquivo CSV.
 """
 
 from pathlib import Path
@@ -18,6 +18,7 @@ NOME_ABA = "Indicadores Mensais"
 # Atenção: IPCA e Selic já estão em "pontos percentuais" (1.25 significa 1,25%).
 # Por isso o "%" vai entre aspas, como texto fixo. O formato de porcentagem do
 # Excel multiplicaria por 100 e mostraria 125%.
+# As chaves precisam ser iguais aos nomes das colunas criados no Transform.
 FORMATOS = {
     "data": "mm/yyyy",
     "ipca": '0.00"%"',
@@ -83,3 +84,21 @@ def salvar_excel(df: pd.DataFrame, caminho: str) -> None:
         for posicao, nome in enumerate(tabela.columns, start=1):
             letra = get_column_letter(posicao)
             aba.column_dimensions[letra].width = max(len(str(nome)) + 4, LARGURA_MINIMA)
+
+
+def salvar_csv(df: pd.DataFrame, caminho: str) -> None:
+    """Salva a tabela mensal final em um arquivo CSV.
+
+    Args:
+        df: tabela final do Transform, com o mês no índice (chamado 'data') e
+            as colunas 'ipca', 'selic' e 'dolar'.
+        caminho: onde salvar o arquivo, por exemplo "data/indicadores_mensais.csv".
+            A pasta é criada automaticamente se não existir.
+    """
+    # Cria a pasta de destino se ela ainda não existir (ex.: "data/").
+    Path(caminho).parent.mkdir(parents=True, exist_ok=True)
+
+    # Salva o CSV. O index=True garante que a coluna de datas seja incluída.
+    # As datas saem no formato padrão aaaa-mm-dd (ex.: 2021-10-01), que é
+    # inequívoco e é lido corretamente por pandas e outras ferramentas.
+    df.to_csv(caminho, index=True)

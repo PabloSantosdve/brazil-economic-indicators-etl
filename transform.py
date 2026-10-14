@@ -2,6 +2,7 @@
 
 Este arquivo pega as três séries do Banco Central (dólar, Selic e IPCA),
 limpa cada uma, resume tudo em base mensal e junta numa tabela única.
+Ao final, chama a etapa Load para salvar o resultado em Excel e CSV.
 
 Séries usadas (API SGS do Banco Central):
     - 1   -> Dólar (USD/BRL), uma cotação por dia útil
@@ -10,8 +11,9 @@ Séries usadas (API SGS do Banco Central):
 """
 
 import pandas as pd
-from extract import  extrair_serie_bcb
-from load import salvar_excel
+from extract import extrair_serie_bcb
+from load import salvar_excel, salvar_csv
+
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     """Limpa uma série do Banco Central que já está em um DataFrame.
@@ -89,11 +91,12 @@ if __name__ == "__main__":
     dolar_mensal = dolar_transformed.resample('MS', on='data').mean()
 
     # Renomeia a coluna 'valor' de cada tabela, para que as três tenham nomes
-    # diferentes antes de serem juntadas. O inplace=True altera a própria tabela
-    # em vez de criar uma cópia.
-    dolar_mensal.rename(columns={'valor': 'Dolar'}, inplace=True)
-    selic_mensal.rename(columns={'valor': 'Selic'}, inplace=True)
-    ipca_mensal.rename(columns={'valor': 'IPCA'}, inplace=True)
+    # diferentes antes de serem juntadas. Os nomes em minúsculas precisam
+    # combinar com as chaves do dicionário FORMATOS no load.py. O inplace=True
+    # altera a própria tabela em vez de criar uma cópia.
+    dolar_mensal.rename(columns={'valor': 'dolar'}, inplace=True)
+    selic_mensal.rename(columns={'valor': 'selic'}, inplace=True)
+    ipca_mensal.rename(columns={'valor': 'ipca'}, inplace=True)
 
     # --- TRANSFORM, parte 3: junta as três tabelas em uma só ---
     # pd.concat com axis=1 coloca as tabelas lado a lado (as colunas se somam),
@@ -109,5 +112,6 @@ if __name__ == "__main__":
     print(df_mensal.tail())
     print(len(df_mensal))
 
-    # --- LOAD: salva a tabela final em Excel ---
+    # --- LOAD: salva a tabela final em Excel e em CSV ---
     salvar_excel(df_mensal, "data/indicadores_mensais.xlsx")
+    salvar_csv(df_mensal, "data/indicadores_mensais.csv")
