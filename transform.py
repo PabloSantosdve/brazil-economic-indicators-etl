@@ -1,8 +1,8 @@
 """Etapa Transform do pipeline ETL de indicadores econômicos do Brasil.
 
-Este arquivo pega as três séries do Banco Central (dólar, Selic e IPCA),
-limpa cada uma, resume tudo em base mensal e junta numa tabela única.
-Ao final, chama a etapa Load para salvar o resultado em Excel e CSV.
+Este arquivo recebe as três séries do Banco Central (dólar, Selic e IPCA) já
+buscadas pela etapa Extract, limpa cada uma, resume tudo em base mensal e junta
+numa tabela única. Quem chama as etapas em ordem é o main.py.
 
 Séries usadas (API SGS do Banco Central):
     - 1   -> Dólar (USD/BRL), uma cotação por dia útil
@@ -11,8 +11,6 @@ Séries usadas (API SGS do Banco Central):
 """
 
 import pandas as pd
-from extract import extrair_serie_bcb
-from load import salvar_excel, salvar_csv
 
 
 def transform_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -58,26 +56,37 @@ def transform_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-if __name__ == "__main__":
-    # --- EXTRACT: busca as três séries na API do Banco Central ---
-    # Período de 5 anos. A data inicial no dia 1 garante que o IPCA de
-    # outubro de 2021 (cuja data é 01/10/2021) entre no resultado.
-    ipca = extrair_serie_bcb(433, "01/10/2021", "05/10/2026")
-    selic = extrair_serie_bcb(432, "01/10/2021", "05/10/2026")
-    dolar = extrair_serie_bcb(1, "01/10/2021", "05/10/2026")
+def montar_tabela_mensal(ipca: list, selic: list, dolar: list) -> pd.DataFrame:
+    """Monta a tabela mensal única a partir das três séries cruas.
 
-    # Transforma cada lista de dicionários devolvida pela API em uma tabela
-    # (DataFrame) do pandas.
+    Etapas:
+        1. transforma cada lista em uma tabela e limpa os tipos;
+        2. resume cada série para uma linha por mês;
+        3. renomeia as colunas e junta as três lado a lado;
+        4. descarta os meses em que alguma das três séries ainda não tem dado.
+
+    Args:
+        ipca: lista de dicionários devolvida pela API para a série 433.
+        selic: lista de dicionários devolvida pela API para a série 432.
+        dolar: lista de dicionários devolvida pela API para a série 1.
+            Cada item tem o formato {'data': '05/10/2026', 'valor': '5.2204'}.
+
+    Returns:
+        DataFrame com o mês (dia 1) no índice, chamado 'data', e as colunas
+        'ipca', 'selic' e 'dolar'. A tabela termina no último mês em que as
+        três séries estão disponíveis.
+    """
+    # Transforma cada lista de dicionários em uma tabela (DataFrame) do pandas.
     ipca_df = pd.DataFrame(ipca)
     selic_df = pd.DataFrame(selic)
     dolar_df = pd.DataFrame(dolar)
 
-    # --- TRANSFORM, parte 1: limpa os tipos de cada série ---
+    # Limpa os tipos de cada série (data vira data, valor vira número).
     ipca_transformed = transform_data(ipca_df)
     selic_transformed = transform_data(selic_df)
     dolar_transformed = transform_data(dolar_df)
 
-    # --- TRANSFORM, parte 2: resume cada série para uma linha por mês ---
+    # Resume cada série para uma linha por mês.
     # resample('MS', on='data') agrupa as linhas por mês, usando a coluna
     # 'data'. O 'MS' (month start) marca cada mês com o primeiro dia dele.
     # O que vem depois do resample escolhe como resumir cada mês:
@@ -98,20 +107,12 @@ if __name__ == "__main__":
     selic_mensal.rename(columns={'valor': 'selic'}, inplace=True)
     ipca_mensal.rename(columns={'valor': 'ipca'}, inplace=True)
 
-    # --- TRANSFORM, parte 3: junta as três tabelas em uma só ---
+    # Junta as três tabelas em uma só.
     # pd.concat com axis=1 coloca as tabelas lado a lado (as colunas se somam),
     # alinhando as linhas pelo índice, que é o mês. O dropna() em seguida
-    # descarta os meses em que alguma coluna está vazia. Hoje isso acontece nos
+    # descarta os meses em que alguma coluna está vazia. Isso acontece nos
     # meses mais recentes, em que o IPCA ainda não foi divulgado, e também no
-    # mês parcial em andamento. A tabela termina, portanto, no último mês em
-    # que as três séries estão disponíveis.
+    # mês parcial em andamento.
     df_mensal = pd.concat([ipca_mensal, selic_mensal, dolar_mensal], axis=1).dropna()
 
-    # Confere o resultado: as 5 primeiras linhas, as 5 últimas e o total de meses.
-    print(df_mensal.head())
-    print(df_mensal.tail())
-    print(len(df_mensal))
-
-    # --- LOAD: salva a tabela final em Excel e em CSV ---
-    salvar_excel(df_mensal, "data/indicadores_mensais.xlsx")
-    salvar_csv(df_mensal, "data/indicadores_mensais.csv")
+    return df_mensal
