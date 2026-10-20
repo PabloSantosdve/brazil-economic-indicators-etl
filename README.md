@@ -2,130 +2,220 @@
 
 🇬🇧 English | [🇧🇷 Português](#-português)
 
-> 🚧 **Status: in development.** The project is being built step by step. This README will be updated as each stage is completed.
+A simple, beginner-friendly **ETL (Extract, Transform, Load) pipeline** in Python. It collects three key Brazilian economic indicators from the Brazilian Central Bank (BCB) open data API and combines them into a **single, analysis-ready monthly table**, saved as Excel and CSV.
 
 ## 🇬🇧 English
 
-### Overview
+### What it does
 
-A simple, beginner-friendly **ETL (Extract, Transform, Load) pipeline** in Python. It collects three key Brazilian economic indicators from the Brazilian Central Bank (BCB) open data API and combines them into a **single, analysis-ready dataset**.
+| Indicator | Description | In the final table |
+|---|---|---|
+| **USD/BRL** | US dollar exchange rate in Brazilian reais (daily) | `dolar`: monthly average |
+| **Selic** | Selic target rate set by Copom, % per year (daily) | `selic`: value at the end of the month |
+| **IPCA** | Consumer price inflation, % per month (monthly) | `ipca`: monthly variation |
 
-| Indicator | Description |
-|---|---|
-| **USD/BRL** | US dollar exchange rate in Brazilian reais (daily) |
-| **Selic** | Brazilian benchmark interest rate |
-| **IPCA** | Brazilian consumer price inflation (monthly) |
-
-The default time window is the **last 5 years**.
-
-### Why this project?
-
-Economic series are published at different frequencies (daily, monthly) and in raw text formats. This pipeline handles the boring part — fetching, cleaning and aligning the data — so you can focus on analysis.
+By default it fetches the **last 5 years**, up to today.
 
 ### How it works
 
 ```
 Extract  →  Transform  →  Load
-  BCB API     clean, convert,   single table
-  (3 series)  align frequencies (SQLite)
+ BCB API     clean, convert,    Excel + CSV
+ (3 series)  summarize by month (data/ folder)
 ```
 
-1. **Extract:** fetch the three series from the BCB SGS open data API.
-2. **Transform:** convert text to numbers and dates, and align series with different frequencies into one table.
-3. **Load:** store the final dataset so anyone can query it.
+1. **Extract** (`extract.py`): fetches the three series from the BCB SGS open data API.
+2. **Transform** (`transform.py`): converts text to dates and numbers, summarizes each series to one row per month and joins them into one table.
+3. **Load** (`load.py`): saves the final table as a formatted Excel file and as a CSV.
+4. **Entry point** (`main.py`): runs the three steps in order, calculating the dates automatically.
 
-### Example analyses (planned)
+### Getting started
 
-- Month-by-month inflation: when did it rise or fall?
-- USD/BRL vs. Selic: how do they move relative to each other?
+**Requirements:** Python 3.10 or higher and Git.
 
-### Tech stack (planned)
+```bash
+# 1. Clone the repository
+git clone https://github.com/PabloSantosdve/brazil-economic-indicators-etl.git
+cd brazil-economic-indicators-etl
 
-Python · requests · pandas · SQLite
+# 2. Create and activate a virtual environment
+python -m venv .venv
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# Linux / macOS:
+source .venv/bin/activate
+
+# 3. Install the dependencies
+pip install -r requirements.txt
+
+# 4. Run the pipeline
+python main.py
+```
+
+> **Windows tip:** if PowerShell blocks the activation script, run
+> `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once and try again.
+
+### Output
+
+Running `python main.py` creates a `data/` folder with two files:
+
+- `indicadores_mensais.xlsx`: formatted spreadsheet (`R$` for the dollar, `%` for IPCA and Selic).
+- `indicadores_mensais.csv`: plain CSV, dates as `yyyy-mm-dd`.
+
+Both have the same columns:
+
+| Column | Meaning |
+|---|---|
+| `data` | Month (first day of the month) |
+| `ipca` | IPCA inflation, % in the month |
+| `selic` | Selic target rate, % per year, at the end of the month |
+| `dolar` | USD/BRL, monthly average |
+
+### Good to know
+
+- **The table ends at the last month where all three series are available.** IPCA is published with a delay, so the most recent month (and the month in progress) is left out until the data exists. Run the pipeline again later and the new month appears on its own.
+- **Choices made for the monthly summary:** the dollar uses the monthly average (smooths daily swings); Selic and IPCA use the last value of the month (Selic is a "step" that changes only at Copom meetings).
+- To change how many years it fetches, edit `ANOS_DE_HISTORICO` in `main.py`.
+
+### Project structure
+
+```
+brazil-economic-indicators-etl/
+├── main.py            # entry point: runs Extract, Transform and Load
+├── extract.py         # fetches the series from the BCB API
+├── transform.py       # cleans, summarizes by month and joins the series
+├── load.py            # saves the table as Excel and CSV
+├── requirements.txt   # Python dependencies
+└── data/              # generated files (created when you run the pipeline)
+```
 
 ### Roadmap
 
 - [x] Define project goals and data sources
 - [x] Create repository
-- [ ] Extract: fetch the three series from the API
-- [ ] Transform: clean, convert and combine
-- [ ] Load: save to SQLite
-- [ ] Add basic tests
-- [ ] Add usage instructions and example analyses
-
-### Getting started
-
-_Coming soon._
+- [x] Extract: fetch the three series from the API
+- [x] Transform: clean, convert, summarize by month and join
+- [x] Load: save to Excel and CSV
+- [x] Entry point with automatic dates
+- [ ] Basic tests for the transform step
+- [ ] Example analyses (inflation month by month, USD/BRL vs. Selic)
+- [ ] Optional: save to a database with SQLAlchemy
+- [ ] Optional: schedule automatic runs
 
 ### Data source
 
-Data provided by the [Banco Central do Brasil (BCB)](https://dadosabertos.bcb.gov.br/) open data portal. Please check the portal for the current terms of use.
+Data from the [Banco Central do Brasil (BCB)](https://dadosabertos.bcb.gov.br/) open data portal, SGS series 1 (USD/BRL), 432 (Selic target) and 433 (IPCA). Please check the portal for the current terms of use.
 
 ### License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file.
 
 ---
 
 ## 🇧🇷 Português
 
-> 🚧 **Status: em desenvolvimento.** O projeto está sendo construído passo a passo. Este README será atualizado conforme cada etapa for concluída.
+Um **pipeline ETL (Extract, Transform, Load)** simples em Python, pensado para quem está começando. Ele coleta três indicadores econômicos brasileiros na API de dados abertos do Banco Central do Brasil (BCB) e os reúne em **uma única tabela mensal, pronta para análise**, salva em Excel e CSV.
 
-### Visão geral
+### O que ele faz
 
-Um **pipeline ETL (Extract, Transform, Load)** simples em Python, pensado para quem está começando. Ele coleta três indicadores econômicos brasileiros na API de dados abertos do Banco Central do Brasil (BCB) e os reúne em **uma única base, pronta para análise**.
+| Indicador | Descrição | Na tabela final |
+|---|---|---|
+| **USD/BRL** | Cotação do dólar em reais (diária) | `dolar`: média do mês |
+| **Selic** | Meta da Selic definida pelo Copom, % ao ano (diária) | `selic`: valor no fim do mês |
+| **IPCA** | Inflação ao consumidor, % no mês (mensal) | `ipca`: variação do mês |
 
-| Indicador | Descrição |
-|---|---|
-| **USD/BRL** | Cotação do dólar em reais (diária) |
-| **Selic** | Taxa básica de juros da economia brasileira |
-| **IPCA** | Inflação ao consumidor (mensal) |
-
-O período padrão é de **5 anos**.
-
-### Por que este projeto?
-
-As séries econômicas são publicadas em frequências diferentes (diária, mensal) e em formatos brutos de texto. Este pipeline cuida da parte trabalhosa — buscar, limpar e alinhar os dados — para você focar na análise.
+Por padrão, busca os **últimos 5 anos**, até hoje.
 
 ### Como funciona
 
 ```
 Extract  →  Transform  →  Load
-  API BCB     limpar, converter,  tabela única
-  (3 séries)  alinhar frequências (SQLite)
+ API BCB     limpar, converter,  Excel + CSV
+ (3 séries)  resumir por mês     (pasta data/)
 ```
 
-1. **Extract (extrair):** busca as três séries na API SGS do BCB.
-2. **Transform (transformar):** converte textos em números e datas e alinha séries de frequências diferentes em uma só tabela.
-3. **Load (carregar):** grava o resultado final para que qualquer pessoa possa consultar.
+1. **Extract** (`extract.py`): busca as três séries na API de dados abertos SGS do BCB.
+2. **Transform** (`transform.py`): converte textos em datas e números, resume cada série para uma linha por mês e junta tudo numa tabela.
+3. **Load** (`load.py`): salva a tabela final em Excel formatado e em CSV.
+4. **Ponto de entrada** (`main.py`): roda as três etapas em ordem, calculando as datas automaticamente.
 
-### Exemplos de análise (planejados)
+### Como usar
 
-- Inflação mês a mês: quando subiu ou caiu?
-- Dólar × Selic: como se movimentam um em relação ao outro?
+**Requisitos:** Python 3.10 ou superior e Git.
 
-### Tecnologias (planejadas)
+```bash
+# 1. Clone o repositório
+git clone https://github.com/PabloSantosdve/brazil-economic-indicators-etl.git
+cd brazil-economic-indicators-etl
 
-Python · requests · pandas · SQLite
+# 2. Crie e ative um ambiente virtual
+python -m venv .venv
+# Windows (PowerShell):
+.venv\Scripts\Activate.ps1
+# Linux / macOS:
+source .venv/bin/activate
+
+# 3. Instale as dependências
+pip install -r requirements.txt
+
+# 4. Rode o pipeline
+python main.py
+```
+
+> **Dica para Windows:** se o PowerShell bloquear o script de ativação, rode uma vez
+> `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` e tente de novo.
+
+### Resultado
+
+Ao rodar `python main.py`, é criada a pasta `data/` com dois arquivos:
+
+- `indicadores_mensais.xlsx`: planilha formatada (`R$` no dólar, `%` no IPCA e na Selic).
+- `indicadores_mensais.csv`: CSV simples, com datas no formato `aaaa-mm-dd`.
+
+Os dois têm as mesmas colunas:
+
+| Coluna | Significado |
+|---|---|
+| `data` | Mês (primeiro dia do mês) |
+| `ipca` | Inflação IPCA, % no mês |
+| `selic` | Meta da Selic, % ao ano, no fim do mês |
+| `dolar` | USD/BRL, média do mês |
+
+### Bom saber
+
+- **A tabela termina no último mês em que as três séries estão disponíveis.** O IPCA é divulgado com atraso, então o mês mais recente (e o mês em andamento) fica de fora até o dado existir. Rode o pipeline de novo mais tarde e o mês novo aparece sozinho.
+- **Escolhas do resumo mensal:** o dólar usa a média do mês (suaviza as oscilações do dia a dia); a Selic e o IPCA usam o último valor do mês (a Selic é um "degrau" que só muda nas reuniões do Copom).
+- Para mudar quantos anos são buscados, edite `ANOS_DE_HISTORICO` no `main.py`.
+
+### Estrutura do projeto
+
+```
+brazil-economic-indicators-etl/
+├── main.py            # ponto de entrada: roda Extract, Transform e Load
+├── extract.py         # busca as séries na API do BCB
+├── transform.py       # limpa, resume por mês e junta as séries
+├── load.py            # salva a tabela em Excel e CSV
+├── requirements.txt   # dependências Python
+└── data/              # arquivos gerados (criada ao rodar o pipeline)
+```
 
 ### Roteiro
 
 - [x] Definir objetivos e fontes de dados
 - [x] Criar o repositório
-- [ ] Extract: buscar as três séries na API
-- [ ] Transform: limpar, converter e combinar
-- [ ] Load: salvar em SQLite
-- [ ] Adicionar testes básicos
-- [ ] Adicionar instruções de uso e exemplos de análise
-
-### Como começar
-
-_Em breve._
+- [x] Extract: buscar as três séries na API
+- [x] Transform: limpar, converter, resumir por mês e juntar
+- [x] Load: salvar em Excel e CSV
+- [x] Ponto de entrada com datas automáticas
+- [ ] Testes básicos da etapa Transform
+- [ ] Exemplos de análise (inflação mês a mês, dólar × Selic)
+- [ ] Opcional: salvar em banco de dados com SQLAlchemy
+- [ ] Opcional: agendar execuções automáticas
 
 ### Fonte dos dados
 
-Dados do portal de dados abertos do [Banco Central do Brasil (BCB)](https://dadosabertos.bcb.gov.br/). Consulte o portal para conferir os termos de uso atuais.
+Dados do portal de dados abertos do [Banco Central do Brasil (BCB)](https://dadosabertos.bcb.gov.br/), séries SGS 1 (USD/BRL), 432 (meta Selic) e 433 (IPCA). Consulte o portal para conferir os termos de uso atuais.
 
 ### Licença
 
-Este projeto está sob a licença MIT — veja o arquivo [LICENSE](LICENSE).
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE).
