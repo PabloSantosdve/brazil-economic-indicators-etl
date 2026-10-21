@@ -85,6 +85,7 @@ brazil-economic-indicators-etl/
 ├── extract.py         # fetches the series from the BCB API
 ├── transform.py       # cleans, summarizes by month and joins the series
 ├── load.py            # saves the table as Excel and CSV
+├── tests/             # automated tests (run with: python -m pytest)
 ├── requirements.txt   # Python dependencies
 └── data/              # generated files (created when you run the pipeline)
 ```
@@ -97,7 +98,7 @@ brazil-economic-indicators-etl/
 - [x] Transform: clean, convert, summarize by month and join
 - [x] Load: save to Excel and CSV
 - [x] Entry point with automatic dates
-- [ ] Basic tests for the transform step
+- [x] Basic tests for the transform step
 - [ ] Example analyses (inflation month by month, USD/BRL vs. Selic)
 - [ ] Optional: save to a database with SQLAlchemy
 - [ ] Optional: schedule automatic runs
@@ -195,6 +196,7 @@ brazil-economic-indicators-etl/
 ├── extract.py         # busca as séries na API do BCB
 ├── transform.py       # limpa, resume por mês e junta as séries
 ├── load.py            # salva a tabela em Excel e CSV
+├── tests/             # Testes automatizados (Rode: Pytho -m pytest no terminal)
 ├── requirements.txt   # dependências Python
 └── data/              # arquivos gerados (criada ao rodar o pipeline)
 ```
@@ -207,7 +209,7 @@ brazil-economic-indicators-etl/
 - [x] Transform: limpar, converter, resumir por mês e juntar
 - [x] Load: salvar em Excel e CSV
 - [x] Ponto de entrada com datas automáticas
-- [ ] Testes básicos da etapa Transform
+- [x] Testes básicos da etapa Transform
 - [ ] Exemplos de análise (inflação mês a mês, dólar × Selic)
 - [ ] Opcional: salvar em banco de dados com SQLAlchemy
 - [ ] Opcional: agendar execuções automáticas
