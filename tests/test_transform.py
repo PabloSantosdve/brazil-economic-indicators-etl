@@ -1,6 +1,6 @@
 import pandas as pd
 import pytest
-from transform import transform_data
+from transform import transform_data, montar_tabela_mensal
 
 
 def test_transform_data_converte_ordena_e_descarta_invalidos():
@@ -25,3 +25,33 @@ def test_transform_data_data_invalida_levanta_erro():
     # 2. chamar a transform_data e esperar que levante um erro
     with pytest.raises(ValueError):
         transform_data(df_input)
+
+def test_montar_tabela_mensal_resume_e_junta_as_series():
+    # 1. dados de entrada, no formato que a API devolve (tudo em texto)
+    ipca = [
+        {'data': '01/01/2020', 'valor': '0.21'},
+        {'data': '01/02/2020', 'valor': '0.25'},
+    ]
+    selic = [
+        {'data': '02/01/2020', 'valor': '4.50'},
+        {'data': '20/01/2020', 'valor': '4.25'},
+        {'data': '05/02/2020', 'valor': '4.00'},
+    ]
+    dolar = [
+        {'data': '02/01/2020', 'valor': '4.0'},
+        {'data': '20/01/2020', 'valor': '6.0'},
+        {'data': '05/02/2020', 'valor': '5.0'},
+    ]
+
+    # 2. chamar a função, na ordem (ipca, selic, dolar)
+    df = montar_tabela_mensal(ipca, selic, dolar)
+
+    # 3. conferir o resultado
+    assert len(df) == 2                                # janeiro e fevereiro
+    assert list(df.columns) == ['ipca', 'selic', 'dolar']
+    assert df['dolar'].iloc[0] == 5.0                  # média de 4.0 e 6.0
+    assert df['selic'].iloc[0] == 4.25                 # último valor de janeiro
+    assert df['ipca'].iloc[0] == 0.21                  # IPCA de janeiro
+    assert df['dolar'].iloc[1] == 5.0                  # fevereiro (um só valor)
+    assert df['selic'].iloc[1] == 4.00                 # fevereiro (um só valor)
+    
