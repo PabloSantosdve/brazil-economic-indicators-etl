@@ -133,8 +133,6 @@ brazil-economic-indicators-etl/
 - [x] Basic tests for the transform step
 - [x] Example analysis: inflation (IPCA) month by month
 - [x] Example analysis: USD/BRL vs. Selic
-- [ ] Optional: save to a database with SQLAlchemy
-- [ ] Optional: schedule automatic runs
 
 ### Data source
 
@@ -277,8 +275,7 @@ brazil-economic-indicators-etl/
 - [x] Testes básicos da etapa Transform
 - [x] Exemplo de análise: inflação (IPCA) mês a mês
 - [x] Exemplo de análise: dólar × Selic
-- [ ] Opcional: salvar em banco de dados com SQLAlchemy
-- [ ] Opcional: agendar execuções automáticas
+
 
 ### Fonte dos dados
 
