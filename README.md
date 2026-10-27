@@ -27,7 +27,7 @@ Extract  →  Transform  →  Load
 1. **Extract** (`extract.py`): fetches the three series from the BCB SGS open data API.
 2. **Transform** (`transform.py`): converts text to dates and numbers, summarizes each series to one row per month and joins them into one table.
 3. **Load** (`load.py`): saves the final table as a formatted Excel file and as a CSV.
-4. **Entry point** (`main.py`): runs the three steps in order, calculating the dates automatically.
+4. **Entry point** (`main.py`): runs the three steps in order, calculating the dates automatically, and then draws two example charts (`grafico_ipca.py` and `grafico_dolar_selic.py`).
 
 ### Getting started
 
@@ -62,7 +62,9 @@ Running `python main.py` creates a `data/` folder with two files:
 - `indicadores_mensais.xlsx`: formatted spreadsheet (`R$` for the dollar, `%` for IPCA and Selic).
 - `indicadores_mensais.csv`: plain CSV, dates as `yyyy-mm-dd`.
 
-Both have the same columns:
+It also saves two chart images (`grafico_ipca.png` and `grafico_dolar_selic.png`) in the project root, see [Examples](#examples).
+
+Both data files have the same columns:
 
 | Column | Meaning |
 |---|---|
@@ -73,7 +75,7 @@ Both have the same columns:
 
 ### Examples
 
-After running `python main.py`, generate the charts from the CSV.
+`python main.py` already draws both charts and saves them as PNG images. To generate just one of them from the CSV (run `python main.py` at least once first), use the scripts below.
 
 **Inflation month by month** (IPCA of each month, one bar per month):
 
@@ -109,7 +111,7 @@ Run it from the project root. The tests cover the Transform step (type conversio
 
 ```
 brazil-economic-indicators-etl/
-├── main.py            # entry point: runs Extract, Transform and Load
+├── main.py            # entry point: runs Extract, Transform, Load and the charts
 ├── extract.py         # fetches the series from the BCB API
 ├── transform.py       # cleans, summarizes by month and joins the series
 ├── load.py            # saves the table as Excel and CSV
@@ -169,7 +171,7 @@ Extract  →  Transform  →  Load
 1. **Extract** (`extract.py`): busca as três séries na API de dados abertos SGS do BCB.
 2. **Transform** (`transform.py`): converte textos em datas e números, resume cada série para uma linha por mês e junta tudo numa tabela.
 3. **Load** (`load.py`): salva a tabela final em Excel formatado e em CSV.
-4. **Ponto de entrada** (`main.py`): roda as três etapas em ordem, calculando as datas automaticamente.
+4. **Ponto de entrada** (`main.py`): roda as três etapas em ordem, calculando as datas automaticamente, e depois desenha dois gráficos de exemplo (`grafico_ipca.py` e `grafico_dolar_selic.py`).
 
 ### Como usar
 
@@ -204,7 +206,9 @@ Ao rodar `python main.py`, é criada a pasta `data/` com dois arquivos:
 - `indicadores_mensais.xlsx`: planilha formatada (`R$` no dólar, `%` no IPCA e na Selic).
 - `indicadores_mensais.csv`: CSV simples, com datas no formato `aaaa-mm-dd`.
 
-Os dois têm as mesmas colunas:
+Ele também salva duas imagens de gráficos (`grafico_ipca.png` e `grafico_dolar_selic.png`) na pasta raiz do projeto, veja [Exemplos](#exemplos).
+
+Os dois arquivos de dados têm as mesmas colunas:
 
 | Coluna | Significado |
 |---|---|
@@ -215,7 +219,7 @@ Os dois têm as mesmas colunas:
 
 ### Exemplos
 
-Depois de rodar `python main.py`, gere os gráficos a partir do CSV.
+O `python main.py` já desenha os dois gráficos e salva as imagens em PNG. Para gerar só um deles a partir do CSV (rode o `python main.py` pelo menos uma vez antes), use os scripts abaixo.
 
 **Inflação mês a mês** (IPCA de cada mês, uma barra por mês):
 
@@ -251,7 +255,7 @@ Rode na pasta raiz do projeto. Os testes cobrem a etapa Transform (conversão de
 
 ```
 brazil-economic-indicators-etl/
-├── main.py            # ponto de entrada: roda Extract, Transform e Load
+├── main.py            # ponto de entrada: roda Extract, Transform, Load e os gráficos
 ├── extract.py         # busca as séries na API do BCB
 ├── transform.py       # limpa, resume por mês e junta as séries
 ├── load.py            # salva a tabela em Excel e CSV
