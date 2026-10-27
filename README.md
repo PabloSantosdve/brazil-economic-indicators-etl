@@ -71,6 +71,26 @@ Both have the same columns:
 | `selic` | Selic target rate, % per year, at the end of the month |
 | `dolar` | USD/BRL, monthly average |
 
+### Example: inflation month by month
+
+After running `python main.py`, generate the chart from the CSV with:
+
+```bash
+python grafico_ipca.py
+```
+
+It shows the IPCA of each month as a bar and saves the image as `grafico_ipca.png`:
+
+![IPCA month by month](grafico_ipca.png)
+
+### Running the tests
+
+```bash
+python -m pytest
+```
+
+Run it from the project root. The tests cover the Transform step (type conversion, sorting, invalid values and invalid dates, and the monthly table).
+
 ### Good to know
 
 - **The table ends at the last month where all three series are available.** IPCA is published with a delay, so the most recent month (and the month in progress) is left out until the data exists. Run the pipeline again later and the new month appears on its own.
@@ -85,6 +105,7 @@ brazil-economic-indicators-etl/
 ├── extract.py         # fetches the series from the BCB API
 ├── transform.py       # cleans, summarizes by month and joins the series
 ├── load.py            # saves the table as Excel and CSV
+├── grafico_ipca.py    # example: IPCA bar chart from the CSV
 ├── tests/             # automated tests (run with: python -m pytest)
 ├── requirements.txt   # Python dependencies
 └── data/              # generated files (created when you run the pipeline)
@@ -99,9 +120,8 @@ brazil-economic-indicators-etl/
 - [x] Load: save to Excel and CSV
 - [x] Entry point with automatic dates
 - [x] Basic tests for the transform step
-- [ ] Example analyses (inflation month by month, USD/BRL vs. Selic)
-- [ ] Optional: save to a database with SQLAlchemy
-- [ ] Optional: schedule automatic runs
+- [x] Example analysis: inflation (IPCA) month by month
+- [ ] Example analysis: USD/BRL vs. Selic
 
 ### Data source
 
@@ -182,6 +202,26 @@ Os dois têm as mesmas colunas:
 | `selic` | Meta da Selic, % ao ano, no fim do mês |
 | `dolar` | USD/BRL, média do mês |
 
+### Exemplo: inflação mês a mês
+
+Depois de rodar `python main.py`, gere o gráfico a partir do CSV com:
+
+```bash
+python grafico_ipca.py
+```
+
+Ele mostra o IPCA de cada mês em barras e salva a imagem como `grafico_ipca.png`:
+
+![IPCA mês a mês](grafico_ipca.png)
+
+### Rodando os testes
+
+```bash
+python -m pytest
+```
+
+Rode na pasta raiz do projeto. Os testes cobrem a etapa Transform (conversão de tipos, ordenação, valores inválidos, datas inválidas e a tabela mensal).
+
 ### Bom saber
 
 - **A tabela termina no último mês em que as três séries estão disponíveis.** O IPCA é divulgado com atraso, então o mês mais recente (e o mês em andamento) fica de fora até o dado existir. Rode o pipeline de novo mais tarde e o mês novo aparece sozinho.
@@ -196,7 +236,8 @@ brazil-economic-indicators-etl/
 ├── extract.py         # busca as séries na API do BCB
 ├── transform.py       # limpa, resume por mês e junta as séries
 ├── load.py            # salva a tabela em Excel e CSV
-├── tests/             # Testes automatizados (Rode: Pytho -m pytest no terminal)
+├── grafico_ipca.py    # exemplo: gráfico do IPCA a partir do CSV
+├── tests/             # testes automáticos (rode: python -m pytest)
 ├── requirements.txt   # dependências Python
 └── data/              # arquivos gerados (criada ao rodar o pipeline)
 ```
@@ -210,9 +251,9 @@ brazil-economic-indicators-etl/
 - [x] Load: salvar em Excel e CSV
 - [x] Ponto de entrada com datas automáticas
 - [x] Testes básicos da etapa Transform
-- [ ] Exemplos de análise (inflação mês a mês, dólar × Selic)
-- [ ] Opcional: salvar em banco de dados com SQLAlchemy
-- [ ] Opcional: agendar execuções automáticas
+- [x] Exemplo de análise: inflação (IPCA) mês a mês
+- [ ] Exemplo de análise: dólar × Selic
+
 
 ### Fonte dos dados
 
