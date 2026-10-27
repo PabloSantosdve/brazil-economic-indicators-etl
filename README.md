@@ -71,17 +71,25 @@ Both have the same columns:
 | `selic` | Selic target rate, % per year, at the end of the month |
 | `dolar` | USD/BRL, monthly average |
 
-### Example: inflation month by month
+### Examples
 
-After running `python main.py`, generate the chart from the CSV with:
+After running `python main.py`, generate the charts from the CSV.
+
+**Inflation month by month** (IPCA of each month, one bar per month):
 
 ```bash
 python grafico_ipca.py
 ```
 
-It shows the IPCA of each month as a bar and saves the image as `grafico_ipca.png`:
-
 ![IPCA month by month](grafico_ipca.png)
+
+**USD/BRL and Selic** (two stacked charts sharing the same months, so you can compare *when* each one rose or fell without a shared scale suggesting a relationship):
+
+```bash
+python grafico_dolar_selic.py
+```
+
+![USD/BRL and Selic month by month](grafico_dolar_selic.png)
 
 ### Running the tests
 
@@ -106,6 +114,7 @@ brazil-economic-indicators-etl/
 ├── transform.py       # cleans, summarizes by month and joins the series
 ├── load.py            # saves the table as Excel and CSV
 ├── grafico_ipca.py    # example: IPCA bar chart from the CSV
+├── grafico_dolar_selic.py  # example: USD/BRL and Selic charts from the CSV
 ├── tests/             # automated tests (run with: python -m pytest)
 ├── requirements.txt   # Python dependencies
 └── data/              # generated files (created when you run the pipeline)
@@ -121,7 +130,9 @@ brazil-economic-indicators-etl/
 - [x] Entry point with automatic dates
 - [x] Basic tests for the transform step
 - [x] Example analysis: inflation (IPCA) month by month
-- [ ] Example analysis: USD/BRL vs. Selic
+- [x] Example analysis: USD/BRL vs. Selic
+- [ ] Optional: save to a database with SQLAlchemy
+- [ ] Optional: schedule automatic runs
 
 ### Data source
 
@@ -202,17 +213,25 @@ Os dois têm as mesmas colunas:
 | `selic` | Meta da Selic, % ao ano, no fim do mês |
 | `dolar` | USD/BRL, média do mês |
 
-### Exemplo: inflação mês a mês
+### Exemplos
 
-Depois de rodar `python main.py`, gere o gráfico a partir do CSV com:
+Depois de rodar `python main.py`, gere os gráficos a partir do CSV.
+
+**Inflação mês a mês** (IPCA de cada mês, uma barra por mês):
 
 ```bash
 python grafico_ipca.py
 ```
 
-Ele mostra o IPCA de cada mês em barras e salva a imagem como `grafico_ipca.png`:
-
 ![IPCA mês a mês](grafico_ipca.png)
+
+**Dólar e Selic** (dois gráficos empilhados com os mesmos meses, para comparar *quando* cada um subiu ou caiu sem que uma escala comum sugira uma relação):
+
+```bash
+python grafico_dolar_selic.py
+```
+
+![Dólar e Selic mês a mês](grafico_dolar_selic.png)
 
 ### Rodando os testes
 
@@ -237,6 +256,7 @@ brazil-economic-indicators-etl/
 ├── transform.py       # limpa, resume por mês e junta as séries
 ├── load.py            # salva a tabela em Excel e CSV
 ├── grafico_ipca.py    # exemplo: gráfico do IPCA a partir do CSV
+├── grafico_dolar_selic.py  # exemplo: gráficos de dólar e Selic a partir do CSV
 ├── tests/             # testes automáticos (rode: python -m pytest)
 ├── requirements.txt   # dependências Python
 └── data/              # arquivos gerados (criada ao rodar o pipeline)
@@ -252,8 +272,9 @@ brazil-economic-indicators-etl/
 - [x] Ponto de entrada com datas automáticas
 - [x] Testes básicos da etapa Transform
 - [x] Exemplo de análise: inflação (IPCA) mês a mês
-- [ ] Exemplo de análise: dólar × Selic
-
+- [x] Exemplo de análise: dólar × Selic
+- [ ] Opcional: salvar em banco de dados com SQLAlchemy
+- [ ] Opcional: agendar execuções automáticas
 
 ### Fonte dos dados
 
