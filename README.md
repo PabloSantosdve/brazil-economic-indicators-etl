@@ -1,5 +1,7 @@
 # brazil-economic-indicators-etl
 
+![Banner](banner.png)
+
 🇬🇧 English | [🇧🇷 Português](#-português)
 
 A simple, beginner-friendly **ETL (Extract, Transform, Load) pipeline** in Python. It collects three key Brazilian economic indicators from the Brazilian Central Bank (BCB) open data API and combines them into a **single, analysis-ready monthly table**, saved as Excel and CSV.
