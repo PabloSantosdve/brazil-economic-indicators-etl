@@ -1,6 +1,6 @@
 # brazil-economic-indicators-etl
 
-![Banner](banner.png)
+![Banner](Pipeline%20de%20Dados%20Neon%20Futurista.png)
 
 🇬🇧 English | [🇧🇷 Português](#-português)
 
